@@ -18,7 +18,7 @@ Outputs:
     data/processed/ct_agents_init.csv
     data/processed/ct_calibration.csv
 
-Catalogue numbers (cite these in M2):
+Catalogue numbers:
     2021: Statistics Canada, Census Profile 2021, Catalogue no. 98-401-X2021007
     2016: Statistics Canada, Census Profile 2016, Catalogue no. 98-401-X2016043
 """
@@ -284,7 +284,7 @@ else:
     print(f"\nSaved → {OUT_CALIB}")
 
     print(f"""
-── M2 documentation notes ───────────────────────────────────────────────────
+── Documentation notes ───────────────────────────────────────────────────
 Data sources:
   2021: Statistics Canada, Census Profile 2021, Catalogue no. 98-401-X2021007
   2016: Statistics Canada, Census Profile 2016, Catalogue no. 98-401-X2016043
@@ -294,7 +294,7 @@ Calibration:
   Stage 1 target (dev_occurred=1): delta_units > {DEV_THRESHOLD_ABS} OR growth > {DEV_THRESHOLD_PCT*100:.0f}%
   Stage 2 target (units added):    delta_units for CTs where dev_occurred=1
 
-Known limitations to document in M2:
+Known limitations to document:
   1. {n_dropped} CTs excluded due to CT boundary changes between 2016 and 2021
   2. delta_units slightly upward-biased: 2021 includes vacant units, 2016 does not
   3. Transit proximity indicator added separately (compute_transit_indicator.py)

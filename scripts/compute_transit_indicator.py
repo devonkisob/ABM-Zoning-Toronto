@@ -21,7 +21,7 @@ Inputs:
 Outputs:
     data/processed/ct_transit_indicators.csv
 
-Data sources to cite in M2:
+Data sources:
     TTC GTFS: City of Toronto Open Data, "TTC Routes and Schedules"
               https://open.toronto.ca/dataset/ttc-routes-and-schedules/
               Licensed under Open Government Licence - Toronto
@@ -223,7 +223,7 @@ out.to_csv(OUT_CSV, index=False)
 print(f"\nSaved → {OUT_CSV}")
 
 print("""
-── For your M2 write-up ──────────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────────────────────
 Transit proximity input model:
 
   transit_indicator (continuous, 0–1):
