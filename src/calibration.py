@@ -319,6 +319,12 @@ def predict_development(ct, policy, stage1, stage2, scaler, features,
     }
 
     x = np.array([feature_map.get(f, 0.0) for f in features]).reshape(1, -1)
+
+    # Replace NaN with 0 before scaling — affects CTs with suppressed census
+    # data (~8 CTs). Imputing with 0 is equivalent to assuming the feature mean
+    # after scaling (since scaler centres to mean=0).
+    x = np.nan_to_num(x, nan=0.0)
+
     x_scaled = scaler.transform(x)
 
     # Stage 1: sample development occurrence
