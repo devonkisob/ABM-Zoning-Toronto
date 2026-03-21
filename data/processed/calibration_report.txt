@@ -1,0 +1,50 @@
+CALIBRATION REPORT
+============================================================
+Training CTs (total):          1078
+Stage 1 training CTs:          1078
+Stage 2 training CTs:          996
+Features used:                 14
+
+Stage 1 — Logistic Regression (dev_occurred)
+----------------------------------------
+5-fold CV F1:    0.729 ± 0.146
+
+              precision    recall  f1-score   support
+
+      No dev       0.18      0.78      0.29        82
+         Dev       0.97      0.70      0.81       996
+
+    accuracy                           0.71      1078
+   macro avg       0.58      0.74      0.55      1078
+weighted avg       0.91      0.71      0.77      1078
+
+
+Stage 1 Feature Coefficients:
+                     feature  coefficient
+     median_household_income    -1.469194
+             population_2021     0.893494
+                  home_price     0.864740
+                 rent_growth     0.771187
+           transit_indicator     0.444594
+         renter_share_change     0.325030
+               income_growth    -0.256267
+median_household_income_2016     0.240181
+           home_price_growth     0.169135
+           renter_share_2016    -0.155517
+                renter_share    -0.108802
+             home_price_2016     0.068849
+            total_households     0.042097
+                 annual_rent     0.022096
+
+Stage 2 — Linear Regression (delta_units | dev_occurred=1)
+----------------------------------------
+5-fold CV R²:    0.312 ± 0.228
+In-sample MAE:   165.3 units
+In-sample R²:    0.508
+
+Known limitations:
+  - 128 CTs excluded due to boundary changes (inner join 2016/2021)
+  - Stage 1 target imbalanced (92% dev=1); balanced class weights used
+  - Stage 2 uses linear model; CT heterogeneity limits R²
+  - No explicit zoning eligibility variable (proxy: density + transit)
+  - Calibration period 2016-2021 includes COVID-19 (2020-2021)
