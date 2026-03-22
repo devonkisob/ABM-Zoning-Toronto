@@ -38,21 +38,21 @@ from src.calibration import load_models, predict_development
 # ── Global simulation parameters ───────────────────────────────────────────────
 # These are set here as defaults and can be overridden in run_scenario().
 
-# Number of time steps (years).
-T_DEFAULT = 10
+# Number of time steps (10 years × 4 quarters).
+T_DEFAULT = 40
 
 # Number of Monte Carlo realisations.
 N_DEFAULT = 100
 
 # Market update parameters (placeholder; sensitivity analysis in Final Report)
-PRICE_KAPPA = 0.05   # price elasticity w.r.t. vacancy gap
-RENT_KAPPA  = 0.04   # rent elasticity w.r.t. vacancy gap
+PRICE_KAPPA = 0.15   # price elasticity w.r.t. vacancy gap
+RENT_KAPPA  = 0.10   # rent elasticity w.r.t. vacancy gap
 V_STAR      = 0.03   # target vacancy rate (CMHC Toronto avg ~3%)
 
 # Demand model parameters
-# Base: ~15,000 net new households/year in Toronto (CMHC Housing Market Outlook)
-BASE_DEMAND   = 15_000
-DEMAND_GROWTH = 0.01   # 1% annual growth in household formation
+# Base: # 2% of total housing stock per quarter as demand pressure
+BASE_DEMAND   = 0.02
+DEMAND_GROWTH = 0.0025   # 1% annual growth ÷ 4 quarters in household formation
 
 # Infrastructure model parameters (placeholder)
 OMEGA0        = 0.5

@@ -335,7 +335,10 @@ def predict_development(ct, policy, stage1, stage2, scaler, features,
     if not policy.is_eligible(ct.ctuid):
         return 0
 
-    p_dev_adjusted = min(1.0, p_dev * (1.0 + 0.3 * policy.incentive_level))
+    # Scale p_dev by 1/T so development is a per-simulation-period probability
+    # not an annual probability. T=10 years matches the simulation horizon.
+    T_HORIZON = 40
+    p_dev_adjusted = min(1.0, (p_dev / T_HORIZON) * (1.0 + 0.3 * policy.incentive_level))
     dev_event = rng.random() < p_dev_adjusted
 
     if not dev_event:

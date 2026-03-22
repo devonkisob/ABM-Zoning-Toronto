@@ -130,10 +130,11 @@ class CensusTractAgent:
         housing model structure. Parameters are placeholder values to be
         calibrated in sensitivity analysis for the Final Report.
         """
+        # Vacancy rises when supply exceeds demand, falls when demand exceeds supply
         demand_per_unit = self.demand_pressure / max(self.units_total, 1)
 
         self.vacancy_rate = float(np.clip(
-            self.vacancy_rate + 0.02 - 0.5 * demand_per_unit,
+            self.vacancy_rate - 0.02 + 0.5 * demand_per_unit,
             0.0, 0.25
         ))
 
@@ -272,7 +273,7 @@ class DemandAllocationModel:
     affordability-based attractiveness weights.
 
     Input model:
-        city_demand(t) = base_demand * (1 + growth_rate)^t * lognormal(0, sigma)
+        city_demand(t) = total_units * base_demand * (1 + growth_rate)^t * lognormal(0, sigma)
         demand_i = city_demand * (attractiveness_i / sum(attractiveness))
         attractiveness_i = 1 / max(home_price_i, 1)
 
@@ -285,17 +286,17 @@ class DemandAllocationModel:
     demand_growth: float             # annual demand growth rate
     rng:          np.random.Generator
 
-    def city_demand(self, t: int) -> float:
-        """Stochastic city-level demand at time step t (years)."""
+    def city_demand(self, t: int, total_units: int) -> float:
         shock = self.rng.lognormal(mean=0.0, sigma=0.1)
-        return self.base_demand * ((1 + self.demand_growth) ** t) * shock
+        return total_units * self.base_demand * ((1 + self.demand_growth) ** t) * shock
 
     def allocate(self, cts: List[CensusTractAgent], t: int) -> None:
         """
         Distribute city demand across CTs proportional to attractiveness.
         Updates ct.demand_pressure in place.
         """
-        total = self.city_demand(t)
+        total_units = sum(ct.units_total for ct in cts)
+        total = self.city_demand(t, total_units)
         prices = np.array([ct.home_price for ct in cts], dtype=float)
         attractiveness = 1.0 / np.maximum(prices, 1.0)
         weights = attractiveness / max(attractiveness.sum(), 1e-9)
