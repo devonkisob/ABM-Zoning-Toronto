@@ -22,7 +22,7 @@ For the City of Toronto, how do alternative missing-middle zoning implementation
 ```
 ABM-Zoning-Toronto/
 ├── data/
-│   ├── raw/                  # Raw census and GTFS files (not in git — see docs/data_sources.md)
+│   ├── raw/                  # Raw census and GTFS files (not in git — see data/README.md)
 │   ├── interim/              # Intermediate files
 │   └── processed/            # Agent initialization, calibration, and results CSVs
 ├── src/
