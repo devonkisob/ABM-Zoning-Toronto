@@ -38,13 +38,12 @@ Installing dependencies (add to requirements.txt):
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
-from pathlib import Path
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-GTFS_DIR      = Path("data/raw/ttc_gtfs")
-BOUNDARY_SHP  = Path("data/raw/ct_boundaries/lct_000b21a_e/lct_000b21a_e.shp")
-AGENTS_CSV    = Path("data/processed/ct_agents_init.csv")
-OUT_CSV       = Path("data/processed/ct_transit_indicators.csv")
+from src.paths import (
+    GTFS_DIR, BOUNDARY_SHP, AGENTS_CSV,
+    TRANSIT_CSV as OUT_CSV,
+)
 
 # ── Parameters ─────────────────────────────────────────────────────────────────
 # Radius for "near transit" — 500m is standard TOD (transit-oriented development)

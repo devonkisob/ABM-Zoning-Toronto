@@ -19,12 +19,9 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import List, Optional
+from src.paths import AGENTS_CSV, TRANSIT_CSV, CALIB_CSV
 
-# ── Paths ──────────────────────────────────────────────────────────────────────
-AGENTS_CSV  = Path("data/processed/ct_agents_init.csv")
-TRANSIT_CSV = Path("data/processed/ct_transit_indicators.csv")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -347,8 +344,7 @@ class InfrastructureModel:
 # LOADER — initialize agents from processed CSV files
 # ══════════════════════════════════════════════════════════════════════════════
 
-def load_agents(agents_csv: Path = AGENTS_CSV,
-                transit_csv: Path = TRANSIT_CSV) -> List[CensusTractAgent]:
+def load_agents(agents_csv=AGENTS_CSV, transit_csv=TRANSIT_CSV) -> List[CensusTractAgent]:
     """
     Load and initialize all CensusTractAgent objects from processed data.
 
@@ -363,7 +359,7 @@ def load_agents(agents_csv: Path = AGENTS_CSV,
                                             "near_rapid_500m"]]
 
     # Try to merge 2016 baseline values from calibration table if available
-    calib_path = agents_csv.parent / "ct_calibration.csv"
+    calib_path = CALIB_CSV
     if calib_path.exists():
         calib_df = pd.read_csv(calib_path)[[
             "ctuid", "median_household_income_2016",

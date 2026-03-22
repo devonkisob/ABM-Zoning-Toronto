@@ -23,15 +23,19 @@ Catalogue numbers:
     2016: Statistics Canada, Census Profile 2016, Catalogue no. 98-401-X2016043
 """
 
-import pandas as pd
+import sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import pandas as pd
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-RAW_2021   = Path("data/raw/98-401-X2021007_English_CSV_data.csv")
-RAW_2016   = Path("data/raw/98-401-X2016043_English_CSV_data.csv")
-OUT_AGENTS = Path("data/processed/ct_agents_init.csv")
-OUT_CALIB  = Path("data/processed/ct_calibration.csv")
-OUT_AGENTS.parent.mkdir(parents=True, exist_ok=True)
+from src.paths import (
+    CENSUS_2021 as RAW_2021,
+    CENSUS_2016 as RAW_2016,
+    AGENTS_CSV  as OUT_AGENTS,
+    CALIB_CSV   as OUT_CALIB,
+)
 
 TORONTO_CMA = "535"
 CHUNK_SIZE  = 200_000

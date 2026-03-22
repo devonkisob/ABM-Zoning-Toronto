@@ -36,36 +36,15 @@ from src.agents import (
 from src.calibration import load_models, predict_development
 
 # ── Global simulation parameters ───────────────────────────────────────────────
-# These are set here as defaults and can be overridden in run_scenario().
+from src.config import DEFAULT_CONFIG as cfg
 
-# Number of time steps (10 years × 4 quarters).
-T_DEFAULT = 40
-
-# Number of Monte Carlo realisations.
-N_DEFAULT = 100
-
-# Market update parameters (placeholder; sensitivity analysis in Final Report)
-PRICE_KAPPA = 0.15   # price elasticity w.r.t. vacancy gap
-RENT_KAPPA  = 0.10   # rent elasticity w.r.t. vacancy gap
-V_STAR      = 0.03   # target vacancy rate (CMHC Toronto avg ~3%)
-
-# Demand model parameters
-# Base: # 2% of total housing stock per quarter as demand pressure
-BASE_DEMAND   = 0.02
-DEMAND_GROWTH = 0.0025   # 1% annual growth ÷ 4 quarters in household formation
-
-# Infrastructure model parameters (placeholder)
-OMEGA0        = 0.5
-OMEGA1        = 0.3
-G_BASE        = 0.01
-LAMBDA_INCENT = 0.005
-
-SCENARIOS = ["S0", "S1", "S2", "S3"]
-
+T_DEFAULT = cfg.T
+N_DEFAULT = cfg.N
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SIMULATION
 # ══════════════════════════════════════════════════════════════════════════════
+SCENARIOS = ["S0", "S1", "S2", "S3"]
 
 def run_scenario(
     scenario: str,
@@ -133,15 +112,15 @@ def run_scenario(
 
         # Initialise pseudo-agents
         demand_model = DemandAllocationModel(
-            base_demand=BASE_DEMAND,
-            demand_growth=DEMAND_GROWTH,
+            base_demand=cfg.base_demand,
+            demand_growth=cfg.demand_growth,
             rng=rng,
         )
         infra_model = InfrastructureModel(
-            omega0=OMEGA0,
-            omega1=OMEGA1,
-            g_base=G_BASE,
-            lambda_incent=LAMBDA_INCENT,
+            omega0=cfg.omega0,
+            omega1=cfg.omega1,
+            g_base=cfg.g_base,
+            lambda_incent=cfg.lambda_incent,
         )
 
         # ── Time step loop ──────────────────────────────────────────────────
@@ -168,7 +147,8 @@ def run_scenario(
 
             # 3. Market update — prices, rents, vacancy
             for ct in cts:
-                ct.update_market(PRICE_KAPPA, RENT_KAPPA, V_STAR)
+                ct.update_market(cfg.price_kappa, cfg.rent_kappa, cfg.v_star)
+
 
             # 4. Infrastructure update
             for ct in cts:

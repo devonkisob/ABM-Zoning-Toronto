@@ -29,7 +29,6 @@ Outputs:
 import pandas as pd
 import numpy as np
 import pickle
-from pathlib import Path
 
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.preprocessing import StandardScaler
@@ -40,19 +39,16 @@ from sklearn.metrics import (
 )
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-CALIB_CSV   = Path("data/processed/ct_calibration.csv")
-TRANSIT_CSV = Path("data/processed/ct_transit_indicators.csv")
-OUT_DIR     = Path("data/processed")
-OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-STAGE1_PKL  = OUT_DIR / "stage1_model.pkl"
-STAGE2_PKL  = OUT_DIR / "stage2_model.pkl"
-SCALER_PKL  = OUT_DIR / "feature_scaler.pkl"
-REPORT_TXT  = OUT_DIR / "calibration_report.txt"
+from src.paths import (
+    STAGE1_PKL, STAGE2_PKL, SCALER_PKL,
+    CALIB_REPORT as REPORT_TXT,
+    CALIB_CSV, TRANSIT_CSV, PROCESSED_DIR as OUT_DIR,
+)
 
 # Random seed for reproducibility
 SEED = 42
 
+from src.config import DEFAULT_CONFIG as cfg
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FEATURE DEFINITION
@@ -337,8 +333,7 @@ def predict_development(ct, policy, stage1, stage2, scaler, features,
 
     # Scale p_dev by 1/T so development is a per-simulation-period probability
     # not an annual probability. T=10 years matches the simulation horizon.
-    T_HORIZON = 40
-    p_dev_adjusted = min(1.0, (p_dev / T_HORIZON) * (1.0 + 0.3 * policy.incentive_level))
+    p_dev_adjusted = min(1.0, (p_dev / cfg.t_horizon) * (1.0 + 0.3 * policy.incentive_level))
     dev_event = rng.random() < p_dev_adjusted
 
     if not dev_event:
