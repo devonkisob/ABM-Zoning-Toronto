@@ -10,6 +10,9 @@ A census-tract-based agent-based simulation of housing affordability under alter
 ## Research Question
 For the City of Toronto, how do alternative missing-middle zoning implementations change the evolution of housing affordability across census tracts over a 10-year horizon, under infrastructure capacity constraints and uncertain market response?
 
+## Workflow
+<img width="2688" height="1000" alt="SYDE 535 Workflow Diagram" src="https://github.com/user-attachments/assets/a118f40d-1730-4239-ad82-7bbe9534fca8" />
+
 ## Scenarios
 | ID | Description |
 |----|-------------|
