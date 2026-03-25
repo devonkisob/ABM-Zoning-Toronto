@@ -44,8 +44,10 @@ ABM-Zoning-Toronto/
 │   ├── figures/              # Generated plots
 │   └── tables/               # Summary statistics
 └── docs/
-    ├── data_sources.md       # How to download raw data files
     └── notes.md              # Development notes
+    └── SYDE 535 - Project Pitch.pdf              # Original Pitch
+    └── SYDE 535 Milestone 1.pdf              # Progress Update 1
+    └── SYDE 535 Milestone 2.pdf              # Progress Update 2
 ```
 
 ## Quickstart
@@ -58,7 +60,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Download raw data
-See [`docs/README.md`](https://github.com/devonkisob/ABM-Zoning-Toronto/blob/main/data/README.md) for download instructions. Place files in `data/raw/`.
+See [`data/README.md`](https://github.com/devonkisob/ABM-Zoning-Toronto/blob/main/data/README.md) for download instructions. Place files in `data/raw/`.
 
 ### 3. Preprocess census data
 ```bash
