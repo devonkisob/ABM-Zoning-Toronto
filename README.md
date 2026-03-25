@@ -58,7 +58,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Download raw data
-See `docs/data_sources.md` for download instructions. Place files in `data/raw/`.
+See [`docs/README.md`](https://github.com/devonkisob/ABM-Zoning-Toronto/blob/main/data/README.md) for download instructions. Place files in `data/raw/`.
 
 ### 3. Preprocess census data
 ```bash
@@ -74,10 +74,10 @@ python scripts/run_simulation.py --full    # N=500, final report
 ```
 
 ### 5. View results
-Open `notebooks/milestone2_results.ipynb` in Jupyter or VS Code.
+Open [`notebooks/milestone2_results.ipynb`](https://github.com/devonkisob/ABM-Zoning-Toronto/blob/main/notebooks/milestone2_results.ipynb) in Jupyter or VS Code.
 
 ## Current Status
-**Milestone 2 complete.**
+**Milestone 2 complete** (see [`docs/SYDE 535 Milestone 2.pdf`](https://github.com/devonkisob/ABM-Zoning-Toronto/blob/main/docs/SYDE%20535%20Milestone%202.pdf))
 - Data pipeline: StatCan 2021/2016 census + TTC GTFS → 1,220 Toronto CT agents
 - ML calibration: two-stage logistic + linear regression (Stage 1 F1=0.73, Stage 2 R²=0.31)
 - Simulation: N=100 Monte Carlo realisations, T=40 quarterly steps (10 years)
