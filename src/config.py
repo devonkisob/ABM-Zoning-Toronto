@@ -41,10 +41,10 @@ class SimConfig:
 
     # ── Market update ────────────────────────────────────────────────────────
     # Elasticity of price/rent to vacancy gap (v_star - vacancy_rate).
-    # Placeholder values — sensitivity analysis planned for Final Report.
-    price_kappa: float = 0.15   # ownership price elasticity
-    rent_kappa:  float = 0.10   # rental price elasticity
+    price_kappa: float = 2.149   # ownership price elasticity
+    rent_kappa:  float = 1.446   # rental price elasticity
     v_star:      float = 0.03   # target vacancy rate (CMHC Toronto avg ~3%)
+    vacancy_eq: float = 0.013   # steady-state vacancy in S0 (~Toronto tight market)
 
     # ── Infrastructure model ─────────────────────────────────────────────────
     omega0:        float = 0.5    # baseline infra load

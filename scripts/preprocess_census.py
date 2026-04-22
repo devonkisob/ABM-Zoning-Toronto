@@ -191,6 +191,9 @@ AGENT_COLS = [
 agents = wide_2021[[c for c in AGENT_COLS if c in wide_2021.columns]]
 agents = agents.dropna(subset=["median_household_income"])
 
+from scripts.knn_impute import knn_impute_spatial
+agents = knn_impute_spatial(agents, cols=["home_price", "annual_rent"], k=5)
+
 print(f"\nAgent init table: {len(agents)} Census Tracts")
 print(f"Sample ct_code values: {agents['ct_code'].head(3).tolist()}")
 agents.to_csv(OUT_AGENTS, index=False)

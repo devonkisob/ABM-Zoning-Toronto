@@ -28,7 +28,7 @@ OUT_DIR = Path("data/processed")
 def run_and_save(args_tuple):
     scenario, N, T = args_tuple
     results = run_scenario(scenario, N=N, T=T, verbose=True)
-    out_path = OUT_DIR / f"results_{scenario.lower()}.npy"
+    out_path = OUT_DIR / f"results_{scenario.lower()}_final_calibration.npy"
     np.save(out_path, results)
     return f"Saved {scenario} → {out_path}"
 

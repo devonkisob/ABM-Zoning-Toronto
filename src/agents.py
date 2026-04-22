@@ -103,41 +103,37 @@ class CensusTractAgent:
         self.units_rent  += rent_added
         self.units_own   += own_added
 
-    # ── Behaviour: update market (prices, rents, vacancy) ─────────────────
     def update_market(self, price_kappa: float, rent_kappa: float,
-                      v_star: float) -> None:
+                  v_star: float, vacancy_eq: float) -> None:
         """
-        Update home price, rent, and vacancy rate based on supply-demand gap.
+        Update home price, rent, and vacancy rate.
 
-        Input model:
-            vacancy responds to demand pressure relative to units
-            prices/rents respond to vacancy gap from target vacancy v_star
-
-            demand_per_unit = demand_pressure / max(units_total, 1)
-            vacancy_rate   += 0.02 - 0.5 * demand_per_unit   (clipped 0–0.25)
-            home_price     *= 1 + price_kappa * (v_star - vacancy_rate)
-            annual_rent    *= 1 + rent_kappa  * (v_star - vacancy_rate)
+        Vacancy mean-reverts to vacancy_eq (steady-state equilibrium) each
+        quarter. New supply above baseline pushes vacancy up, slowing price
+        growth. In S0 (no new supply), vacancy settles at vacancy_eq, and
+        price growth equals price_kappa * (v_star - vacancy_eq) per quarter.
 
         Parameters:
-            price_kappa — price elasticity w.r.t. vacancy gap (default 0.05)
-            rent_kappa  — rent elasticity w.r.t. vacancy gap  (default 0.04)
-            v_star      — target vacancy rate (default 0.03, Toronto avg)
-
-        Justification: vacancy-price relationship follows standard hedonic
-        housing model structure. Parameters are placeholder values to be
-        calibrated in sensitivity analysis for the Final Report.
+            price_kappa — price elasticity w.r.t. vacancy gap (calibrated: 2.149)
+            rent_kappa  — rent elasticity w.r.t. vacancy gap  (calibrated: 1.446)
+            v_star      — target vacancy rate (CMHC Toronto avg: 0.03)
+            vacancy_eq  — steady-state vacancy in baseline (Toronto tight market: 0.013)
         """
-        # Vacancy rises when supply exceeds demand, falls when demand exceeds supply
-        demand_per_unit = self.demand_pressure / max(self.units_total, 1)
+        # Supply effect: units added above baseline push vacancy up
+        supply_ratio  = self.units_total / max(self.baseline_units, 1)
+        supply_effect = 0.005 * max(0.0, supply_ratio - 1.0)
 
+        # Mean-reversion toward vacancy_eq
+        phi = 0.15
         self.vacancy_rate = float(np.clip(
-            self.vacancy_rate - 0.02 + 0.5 * demand_per_unit,
+            self.vacancy_rate
+            + phi * (vacancy_eq - self.vacancy_rate)
+            + supply_effect,
             0.0, 0.25
         ))
 
         self.home_price  *= (1.0 + price_kappa * (v_star - self.vacancy_rate))
         self.annual_rent *= (1.0 + rent_kappa  * (v_star - self.vacancy_rate))
-
     # ── Behaviour: update infrastructure ──────────────────────────────────
     def update_infrastructure(self, omega0: float, omega1: float) -> None:
         """
@@ -265,14 +261,15 @@ class DemandAllocationModel:
     City-level demand is exogenous and grows at a fixed rate with
     log-normal stochastic shocks (captures uncertainty in household formation).
 
-    Attractiveness: cheaper CTs (lower home_price) attract more demand.
-    This is a placeholder — the Final Report will add transit and
-    affordability-based attractiveness weights.
-
+    Attractiveness: cheaper CTs attract more demand, weighted by transit proximity.
+    Households are more likely to seek housing near rapid transit, consistent with
+    empirical evidence on transit-oriented demand in Toronto.
+    
     Input model:
         city_demand(t) = total_units * base_demand * (1 + growth_rate)^t * lognormal(0, sigma)
+        attractiveness_i = (1 / max(home_price_i, 1)) * (1 + transit_indicator_i)
         demand_i = city_demand * (attractiveness_i / sum(attractiveness))
-        attractiveness_i = 1 / max(home_price_i, 1)
+        
 
     Data source for base_demand and growth_rate:
         Canada Mortgage and Housing Corporation (CMHC) Housing Market Outlook,
@@ -294,8 +291,9 @@ class DemandAllocationModel:
         """
         total_units = sum(ct.units_total for ct in cts)
         total = self.city_demand(t, total_units)
-        prices = np.array([ct.home_price for ct in cts], dtype=float)
-        attractiveness = 1.0 / np.maximum(prices, 1.0)
+        prices = np.array([ct.home_price        for ct in cts], dtype=float)
+        transit = np.array([ct.transit_indicator for ct in cts], dtype=float)
+        attractiveness = (1.0 / np.maximum(prices, 1.0)) * (1.0 + transit)
         weights = attractiveness / max(attractiveness.sum(), 1e-9)
         for ct, w in zip(cts, weights):
             ct.demand_pressure = float(total * w)
@@ -371,12 +369,6 @@ def load_agents(agents_csv=AGENTS_CSV, transit_csv=TRANSIT_CSV) -> List[CensusTr
     df = agents_df.merge(transit_df, on="ctuid", how="left")
     df["transit_indicator"] = df["transit_indicator"].fillna(0.0)
     df["near_rapid_500m"]   = df["near_rapid_500m"].fillna(0).astype(int)
-
-    # Impute median for suppressed CT values before agent initialization
-    median_home_price  = df["home_price"].median()
-    median_annual_rent = df["annual_rent"].median()
-    df["home_price"]   = df["home_price"].fillna(median_home_price)
-    df["annual_rent"]  = df["annual_rent"].fillna(median_annual_rent)
 
     agents = []
     for _, row in df.iterrows():

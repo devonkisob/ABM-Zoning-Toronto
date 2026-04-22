@@ -1,0 +1,11 @@
+{
+  "price_kappa": 2.149,
+  "rent_kappa": 1.446,
+  "calibration_target_annual_price_growth": 0.06,
+  "calibration_target_annual_rent_growth": 0.04,
+  "calibration_source": "Teranet-National Bank HPI Toronto CMA 2010-2019 pre-pandemic average",
+  "calibration_n": 20,
+  "calibration_t": 20,
+  "verified_annual_price_growth": 0.0601,
+  "verified_annual_rent_growth": 0.0403
+}

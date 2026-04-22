@@ -147,7 +147,7 @@ def run_scenario(
 
             # 3. Market update — prices, rents, vacancy
             for ct in cts:
-                ct.update_market(cfg.price_kappa, cfg.rent_kappa, cfg.v_star)
+                ct.update_market(cfg.price_kappa, cfg.rent_kappa, cfg.v_star, cfg.vacancy_eq)
 
 
             # 4. Infrastructure update
@@ -170,7 +170,7 @@ def run_scenario(
             out_strain[i, t]  = np.mean(strains)
 
     if verbose:
-        print(f"  Done. Mean final AI_own:  {out_ai_own[:, -1].mean():.4f}")
+        print(f"  Done {scenario}. Mean final AI_own:  {out_ai_own[:, -1].mean():.4f}")
         print(f"         Mean final AI_rent: {out_ai_rent[:, -1].mean():.4f}")
         print(f"         Mean units added/yr: {out_added.mean():.0f}")
 
