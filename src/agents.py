@@ -75,9 +75,12 @@ class CensusTractAgent:
 
     # Baseline units (set post-init, used for strain proxy)
     baseline_units: int = field(init=False, default=0)
+    # Initial price (set post-init, used as price floor in update_market)
+    initial_home_price: float = field(init=False, default=0.0)
 
     def __post_init__(self):
         self.baseline_units = max(self.units_total, 1)
+        self.initial_home_price = max(self.home_price, 1.0)
 
     # ── Behaviour: apply development ───────────────────────────────────────
     def apply_development(self, units_added: int) -> None:
@@ -132,8 +135,11 @@ class CensusTractAgent:
             0.0, 0.25
         ))
 
-        self.home_price  *= (1.0 + price_kappa * (v_star - self.vacancy_rate))
-        self.annual_rent *= (1.0 + rent_kappa  * (v_star - self.vacancy_rate))
+        price_factor = 1.0 + price_kappa * (v_star - self.vacancy_rate)
+        rent_factor  = 1.0 + rent_kappa  * (v_star - self.vacancy_rate)
+        self.home_price  = max(self.home_price * price_factor,
+                               self.initial_home_price * 0.30)
+        self.annual_rent *= rent_factor
     # ── Behaviour: update infrastructure ──────────────────────────────────
     def update_infrastructure(self, omega0: float, omega1: float) -> None:
         """

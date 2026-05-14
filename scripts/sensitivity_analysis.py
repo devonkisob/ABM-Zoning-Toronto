@@ -45,7 +45,7 @@ N_SA    = 20    # realisations per run (small for speed; increase for Final Repo
 T_SA    = 40    # full 10-year horizon
 DELTA   = 0.20  # ±20% perturbation
 SEED    = 42
-SCENARIO = "S1"  # run sensitivity on baseline (cleanest signal)
+SCENARIO = "S0"  # run sensitivity on baseline (cleanest signal)
 
 # Parameters to test: (name, config_attr, display_label)
 PARAMETERS = [

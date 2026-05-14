@@ -178,6 +178,72 @@ def plot_all_scenarios(results: Dict[str, dict],
     return fig
 
 
+# ── Dual-panel trajectory (absolute + % vs S0) ────────────────────────────────
+
+def plot_all_scenarios_dual(results: Dict[str, dict],
+                             metric: str = "ai_own",
+                             ylabel: str = "Mean Ownership Affordability Index (AI_own)",
+                             title: str = None,
+                             save_path: Path = None) -> plt.Figure:
+    """
+    Two-panel figure: left = absolute trajectories with IQR, right = % improvement vs S0.
+    """
+    s0_mean = results["S0"][metric].mean(axis=0)
+
+    fig, (ax_abs, ax_pct) = plt.subplots(1, 2, figsize=(14, 5))
+
+    improvements = {}
+    for scenario, res in results.items():
+        arr   = res[metric]
+        mean  = arr.mean(axis=0)
+        p25   = np.percentile(arr, 25, axis=0)
+        p75   = np.percentile(arr, 75, axis=0)
+        color = SCENARIO_COLORS.get(scenario, "#888888")
+        label = SCENARIO_LABELS.get(scenario, scenario)
+
+        ax_abs.fill_between(YEARS, p25, p75, color=color, alpha=0.15)
+        ax_abs.plot(YEARS, mean, color=color, linewidth=2, label=label)
+
+        if scenario != "S0":
+            pct = (mean - s0_mean) / s0_mean * 100
+            improvements[scenario] = pct
+            ax_pct.plot(YEARS, pct, color=color, linewidth=2, label=label)
+
+    ax_abs.set_xlabel("Years since policy implementation")
+    ax_abs.set_ylabel(ylabel)
+    ax_abs.set_title("Absolute Trajectories", fontsize=11, fontweight="bold")
+    ax_abs.legend(framealpha=0.9, fontsize=9)
+    ax_abs.set_xlim(0, 10)
+
+    ax_pct.axhline(0, color=SCENARIO_COLORS["S0"], linewidth=1.5,
+                   linestyle="--", label="S0: Status Quo (baseline)")
+    ax_pct.set_xlabel("Years since policy implementation")
+    ax_pct.set_ylabel("% improvement relative to S0")
+    ax_pct.set_title("% Improvement vs Status Quo", fontsize=11, fontweight="bold")
+    ax_pct.legend(framealpha=0.9, fontsize=9)
+    ax_pct.set_xlim(0, 10)
+
+    # Annotate final-year % for each non-S0 scenario
+    for scenario, pct in improvements.items():
+        color = SCENARIO_COLORS.get(scenario, "#888888")
+        ax_pct.annotate(
+            f"{pct[-1]:+.1f}%",
+            xy=(YEARS[-1], pct[-1]),
+            xytext=(8, 0), textcoords="offset points",
+            va="center", fontsize=9, color=color, fontweight="bold",
+        )
+
+    sup = title or ("Ownership Affordability Over 10 Years: All Scenarios\n"
+                    "(N=500 realisations; shaded band = IQR)")
+    fig.suptitle(sup, fontsize=12, fontweight="bold", y=1.01)
+
+    plt.tight_layout()
+    if save_path:
+        fig.savefig(save_path, bbox_inches="tight")
+        print(f"Saved → {save_path}")
+    return fig
+
+
 # ── Spatial heatmap ────────────────────────────────────────────────────────────
 
 def plot_spatial_heatmap(ct_ai_change: pd.DataFrame,
@@ -206,12 +272,18 @@ def plot_spatial_heatmap(ct_ai_change: pd.DataFrame,
 
     TORONTO_CMA   = "535"
     CRS_PROJECTED = "EPSG:32617"
-    CRS_DISPLAY   = "EPSG:4326"
 
-    gdf = gpd.read_file(BOUNDARY_SHP).to_crs(CRS_PROJECTED)
-    gdf = gdf[gdf["DGUID"].str.contains(TORONTO_CMA, na=False)].copy()
+    gdf = gpd.read_file(BOUNDARY_SHP)
+    # startswith avoids false matches on CT numbers that happen to contain "535"
+    gdf = gdf[gdf["DGUID"].str.startswith(f"2021S0507{TORONTO_CMA}")].copy()
+    gdf = gdf.to_crs(CRS_PROJECTED)
     gdf = gdf.rename(columns={"DGUID": "ctuid"})
     gdf = gdf.merge(ct_ai_change[["ctuid", value_col]], on="ctuid", how="left")
+
+    # Clip colormap to 99th percentile so outliers don't wash out the map
+    col_data = ct_ai_change[value_col].dropna()
+    vmin = col_data.min()
+    vmax = col_data.quantile(0.99)
 
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
@@ -219,6 +291,8 @@ def plot_spatial_heatmap(ct_ai_change: pd.DataFrame,
         column=value_col,
         ax=ax,
         cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
         legend=True,
         legend_kwds={
             "label":       value_col.replace("_", " ").title(),

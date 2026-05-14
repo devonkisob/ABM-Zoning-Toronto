@@ -96,8 +96,13 @@ def predict_development(ct, policy, stage1, stage2, scaler, features,
 
     if not policy.is_eligible(ct.ctuid):
         return 0
+    strain_factor = max(0.0, 1.0 - max(0.0, ct.strain - 1.0))
 
-    p_adj = min(1.0, (p_dev / cfg.t_horizon) * (1.0 + 0.3 * policy.incentive_level))
+
+    demand_ratio  = ct.demand_pressure / max(ct.households, 1)
+    demand_factor = 1.0 + 0.1 * demand_ratio
+
+    p_adj = min(1.0, (p_dev / cfg.t_horizon) * (1.0 + 0.3 * policy.incentive_level) * strain_factor * demand_factor)
     if not (rng.random() < p_adj):
         return 0
 

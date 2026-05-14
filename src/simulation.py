@@ -102,7 +102,7 @@ def run_scenario(
     # ── Monte Carlo loop ────────────────────────────────────────────────────
     for i in range(N):
         if verbose and (i % 20 == 0):
-            print(f"  Realisation {i+1}/{N}...")
+            print(f"  Realisation {i+1}/{N}...", flush=True)
 
         # Each realisation gets its own RNG (reproducible but independent)
         rng = np.random.default_rng(seed + i)
