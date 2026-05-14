@@ -13,6 +13,11 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# DS_Store
+.DS_Store
+results/.DS_Store
+**/.DS_Store
+
 # C extensions
 *.so
 
